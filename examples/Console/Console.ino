@@ -1,13 +1,8 @@
-// A line-at-a-time console on the USB serial port: LineReader collects what
-// is typed until a newline and hands the line to CommandDispatcher. Try:
+// A serial console with three commands. Try:
 //
 //   led on        led off
 //   blink 200     blink 200 5
 //   add 2 -7
-//
-// scripts/check.sh compiles it for the Uno and the ESP32, which is how the
-// library proves it builds on each board - the Uno being the one where the
-// names and patterns are read back from flash.
 
 #include <Arduino.h>
 #include <CommandDispatcher.h>

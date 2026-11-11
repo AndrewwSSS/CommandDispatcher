@@ -3,36 +3,8 @@
 #include <ctype.h>
 #include <stdlib.h>
 
-// Turns a line of text into a call: the first word picks a command, the rest
-// are its arguments, checked against what the command said it takes before
-// its handler ever runs.
-//
-//   CommandDispatcher<16> commands(Serial);       // parse errors are printed here
-//
-//   static void go(const CommandArgs& args) { axes.moveToStep(0, args.getLong(0)); }
-//   static void jog(const CommandArgs& args) { axes.moveSteps(0, args.getLong(0, 100)); }
-//
-//   commands.add(F("g"), F("n"), go);       // g -500
-//   commands.add(F("f"), F("[n]"), jog);    // f, f 3200
-//   commands.execute(line);                 // line is a char buffer
-//
-// Words are separated by spaces or tabs. Command names match whatever the
-// case. Nothing is allocated: the table is a fixed CAPACITY, and the line is
-// split in place, so execute() writes into the buffer it is given.
-//
-// What a command takes is a pattern, one letter per argument:
-//
-//   n    a number, decimal and optionally signed: 42, -500, +3
-//   w    a word: anything without a space
-//   [ ]  what is inside is optional, so "n[n]" is one number or two
-//
-// The same name can be added more than once with different patterns, and the
-// first one that fits is called: "lim" with "nn" and again with "w" takes both
-// `lim 0 3200` and `lim off`. When none fits, the handler is not called and
-// the usage line built from the patterns is printed instead.
-//
-// On AVR the names and patterns stay in flash, as F() strings, so a command
-// costs only its table entry in RAM.
+// Dispatches a line of text to a command handler, after checking its
+// arguments against the command's pattern. Usage: README.md.
 
 // Most arguments a line can carry. Raise per project with
 // build_flags = -D CD_MAX_ARGS=6.
