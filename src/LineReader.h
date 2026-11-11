@@ -2,26 +2,8 @@
 #include <Arduino.h>
 #include "CommandDispatcher.h"
 
-// Collects characters from a Stream into lines and hands each finished one
-// to a CommandDispatcher - the loop every console sketch would otherwise write.
-//
-//   CommandDispatcher<16> commands(Serial);
-//   LineReader<32>        usb(Serial);              // a line ends on \r or \n
-//   LineReader<32>        phone(Bluetooth, ';');    // or on a character of your own
-//
-//   void loop() {
-//       usb.poll(commands);
-//       phone.poll(commands);
-//   }
-//
-// poll() reads only what is already waiting, so it never blocks the loop.
-//
-// What a terminal sends besides text is dropped: the escape sequences of the
-// arrow keys, other control bytes, and backspace takes back the last
-// character. Blank lines are skipped, which also covers the LF of a CRLF.
-//
-// A line longer than SIZE - 1 characters is not run cut short: the rest of it
-// is thrown away and "line too long" is printed back to the stream.
+// Reads lines from a Stream without blocking and passes each one to a
+// CommandDispatcher. Usage: README.md.
 
 template <uint8_t SIZE>
 class LineReader {
