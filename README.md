@@ -1,36 +1,57 @@
 # CommandDispatcher
 
+[![check](https://github.com/AndrewwSSS/CommandDispatcher/actions/workflows/check.yml/badge.svg)](https://github.com/AndrewwSSS/CommandDispatcher/actions/workflows/check.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+![Platforms](https://img.shields.io/badge/platforms-AVR%20%7C%20ESP32-informational)
+
 Turns a line of text into a call. The first word picks a command; the rest are
 its arguments, checked against what the command said it takes before its
 handler runs. `LineReader` collects those lines from any `Stream`.
 Header-only, no heap, no `String`, and on AVR the names and patterns stay in
 flash.
 
+## Install
+
+`platformio.ini`:
+
+```ini
+lib_deps = https://github.com/AndrewwSSS/CommandDispatcher.git#v0.1.0
+```
+
 ## Usage
 
 ```cpp
 #include <CommandDispatcher.h>
 
-CommandDispatcher<16> commands(Serial);    // capacity; parse errors are printed to Serial
-LineReader<32>        console(Serial);     // longest line + 1
+static constexpr uint8_t LED = 13;
 
-static void go(const CommandArgs& args) {
-    axes.moveToStep(0, args.getLong(0));
+CommandDispatcher<8> commands(Serial);   // capacity; parse errors are printed to Serial
+LineReader<32>       console(Serial);    // longest line + 1
+
+static void led(const CommandArgs& args) {           // led on | led off
+    digitalWrite(LED, args.is(0, F("on")) ? HIGH : LOW);
 }
 
-static void jog(const CommandArgs& args) {
-    axes.moveSteps(0, args.getLong(0, 100));   // 100 when left out
+static void blink(const CommandArgs& args) {         // blink 200 | blink 200 5
+    for (long i = 0; i < args.getLong(1, 3); i++) {  // 3 times when left out
+        digitalWrite(LED, HIGH); delay(args.getLong(0));
+        digitalWrite(LED, LOW);  delay(args.getLong(0));
+    }
 }
 
 void setup() {
-    commands.add(F("g"), F("n"), go);       // g -500
-    commands.add(F("f"), F("[n]"), jog);    // f    f 3200
+    Serial.begin(115200);
+    pinMode(LED, OUTPUT);
+    commands.add(F("led"), F("w"), led);
+    commands.add(F("blink"), F("n[n]"), blink);
 }
 
 void loop() {
     console.poll(commands);   // reads what is waiting, runs each finished line
 }
 ```
+
+A complete sketch is in [examples/Console](examples/Console/Console.ino).
 
 ## Reading lines
 
@@ -123,3 +144,7 @@ A line no command answers to prints `unknown command: <word>`, or goes to
 pio test -e native     # unit tests, against the fake core in test/fake/
 scripts/check.sh       # unit tests, plus the example built for the Uno and ESP32
 ```
+
+## License
+
+[MIT](LICENSE)
