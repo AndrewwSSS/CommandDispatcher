@@ -1,6 +1,7 @@
 {
   "name": "CommandDispatcher",
   "version": "0.1.0",
+  "license": "MIT",
   "description": "Turns lines from a Stream into calls: a table of named commands, each with a pattern its arguments are checked against before its handler runs. No heap, no String; names and patterns stay in flash on AVR.",
   "keywords": "command, console, parser, serial, cli",
   "frameworks": "arduino",
